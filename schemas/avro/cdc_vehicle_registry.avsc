@@ -1,0 +1,21 @@
+{
+  "type": "record",
+  "name": "CdcVehicleRegistryEvent",
+  "namespace": "io.fleetplatform.events.v1",
+  "doc": "Debezium-compatible PostgreSQL CDC envelope for operational vehicle registry metadata.",
+  "fields": [
+    {"name": "cdc_event_id", "type": "string"},
+    {"name": "op", "type": "string", "doc": "r=snapshot, c=create, u=update, d=delete"},
+    {"name": "ts_ms", "type": "long"},
+    {"name": "lsn", "type": "long"},
+    {"name": "tx_id", "type": "long"},
+    {"name": "vehicle_id", "type": "string"},
+    {"name": "hardware_generation", "type": ["null", "string"], "default": null},
+    {"name": "vehicle_model", "type": ["null", "string"], "default": null},
+    {"name": "assigned_region", "type": ["null", "string"], "default": null},
+    {"name": "software_version", "type": ["null", "string"], "default": null},
+    {"name": "fleet_tier", "type": ["null", "string"], "default": null},
+    {"name": "maintenance_status", "type": ["null", "string"], "default": null},
+    {"name": "schema_version", "type": "string", "default": "1.0.0"}
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "type": "record",
+  "name": "GpsEvent",
+  "namespace": "io.fleetplatform.events.v1",
+  "doc": "High-frequency GPS position and heading frame for fleet.gps.raw.",
+  "fields": [
+    {"name": "event_id", "type": "string"},
+    {"name": "vehicle_id", "type": "string"},
+    {"name": "trip_id", "type": ["null", "string"], "default": null},
+    {"name": "event_type", "type": "string", "default": "gps"},
+    {"name": "event_time", "type": "string"},
+    {"name": "ingest_time", "type": ["null", "string"], "default": null},
+    {"name": "sequence_number", "type": "long"},
+    {"name": "schema_version", "type": "string", "default": "1.0.0"},
+    {"name": "source_id", "type": "string"},
+    {"name": "correlation_id", "type": "string"},
+    {"name": "trace_id", "type": "string"},
+    {"name": "latitude", "type": "double"},
+    {"name": "longitude", "type": "double"},
+    {"name": "heading_deg", "type": "double"},
+    {"name": "speed_mps", "type": "double"},
+    {"name": "region", "type": "string"},
+    {"name": "metadata", "type": {"type": "map", "values": "string"}, "default": {}}
+  ]
+}

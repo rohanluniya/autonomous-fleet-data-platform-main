@@ -1,0 +1,74 @@
+groups:
+  - name: fleet-platform-reliability
+    rules:
+      - alert: FleetDeadLetterQueueSpike
+        expr: increase(fleet_dlq_messages_total[5m]) > 10
+        for: 1m
+        labels:
+          severity: warning
+          owner: data-platform-ingestion
+        annotations:
+          summary: "Elevated poison/schema-invalid messages quarantined to fleet.telemetry.dlq"
+          symptoms: "More than 10 events rejected by Avro contract validation within 5 minutes."
+          diagnosis: "Inspect bronze.telemetry_dlq error_code and schema_version for producer regressions."
+          runbook: "docs/operations/runbooks.md#dlq-spike"
+
+      - alert: FleetConsumerLagHigh
+        expr: fleet_consumer_lag_records > 50000
+        for: 5m
+        labels:
+          severity: critical
+          owner: data-platform-streaming
+        annotations:
+          summary: "Consumer lag exceeds 50,000 records on {{ $labels.topic }} ({{ $labels.consumer_group }})"
+          symptoms: "Ingestion or Flink stream processing is falling behind incoming vehicle telemetry."
+          diagnosis: "Check Flink backpressure, Kafka partition skew (hot vehicle_id), and RustFS S3 write latency."
+          runbook: "docs/operations/runbooks.md#consumer-lag"
+
+      - alert: FleetStreamWatermarkLag
+        expr: fleet_stream_watermark_lag_seconds > 120
+        for: 3m
+        labels:
+          severity: warning
+          owner: data-platform-streaming
+        annotations:
+          summary: "Flink event-time watermark lag exceeded 120s"
+          symptoms: "Windowed anomaly alerts and gap timers are delayed."
+          diagnosis: "Verify idle Kafka partitions or delayed vehicle reconnect bursts."
+          runbook: "docs/operations/runbooks.md#watermark-lag"
+
+      - alert: FleetDataQualityFailure
+        expr: increase(fleet_dq_checks_total{status="FAIL"}[15m]) > 0
+        for: 0m
+        labels:
+          severity: critical
+          owner: data-platform-quality
+        annotations:
+          summary: "Data quality or cross-layer reconciliation check FAILED ({{ $labels.check_name }})"
+          symptoms: "Bronze-to-Silver or Silver-to-Gold counts, schema, or bounds failed configured thresholds."
+          diagnosis: "Query /fleet/data-quality and inspect silver.telemetry_quarantine."
+          runbook: "docs/operations/runbooks.md#dq-failure"
+
+      - alert: FleetGoldFreshnessBreach
+        expr: fleet_data_freshness_seconds > 1800
+        for: 5m
+        labels:
+          severity: warning
+          owner: data-platform-batch
+        annotations:
+          summary: "Gold dataset {{ $labels.dataset }} freshness lag exceeded 30 minutes"
+          symptoms: "Operational dashboards are serving stale Gold aggregates."
+          diagnosis: "Check Airflow fleet_incremental_lakehouse DAG runs and Spark executor logs."
+          runbook: "docs/operations/runbooks.md#freshness-breach"
+
+      - alert: FleetApiP95LatencyHigh
+        expr: histogram_quantile(0.95, sum(rate(fleet_api_request_duration_seconds_bucket[5m])) by (le, endpoint)) > 0.75
+        for: 5m
+        labels:
+          severity: warning
+          owner: data-platform-serving
+        annotations:
+          summary: "FastAPI p95 latency exceeded 750ms on {{ $labels.endpoint }}"
+          symptoms: "Dashboard or downstream API consumers experiencing slow queries."
+          diagnosis: "Check Iceberg small-file count on Gold tables and run compaction maintenance."
+          runbook: "docs/operations/runbooks.md#api-latency"

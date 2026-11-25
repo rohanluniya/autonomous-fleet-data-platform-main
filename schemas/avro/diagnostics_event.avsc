@@ -1,0 +1,27 @@
+{
+  "type": "record",
+  "name": "DiagnosticsEvent",
+  "namespace": "io.fleetplatform.events.v1",
+  "doc": "Fault codes, thermal warnings, and sensor degradation events for fleet.diagnostics.raw.",
+  "fields": [
+    {"name": "event_id", "type": "string"},
+    {"name": "vehicle_id", "type": "string"},
+    {"name": "trip_id", "type": ["null", "string"], "default": null},
+    {"name": "event_type", "type": "string", "default": "diagnostics"},
+    {"name": "event_time", "type": "string"},
+    {"name": "ingest_time", "type": ["null", "string"], "default": null},
+    {"name": "sequence_number", "type": "long"},
+    {"name": "schema_version", "type": "string", "default": "1.0.0"},
+    {"name": "source_id", "type": "string"},
+    {"name": "correlation_id", "type": "string"},
+    {"name": "trace_id", "type": "string"},
+    {"name": "region", "type": "string"},
+    {"name": "software_version", "type": "string"},
+    {"name": "fault_codes", "type": {"type": "array", "items": "string"}},
+    {"name": "battery_temp_c", "type": "double"},
+    {"name": "motor_temp_c", "type": "double"},
+    {"name": "sensor_health_score", "type": "double"},
+    {"name": "severity_hint", "type": "string"},
+    {"name": "metadata", "type": {"type": "map", "values": "string"}, "default": {}}
+  ]
+}

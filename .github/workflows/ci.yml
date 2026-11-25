@@ -1,0 +1,44 @@
+name: CI — Lint, Typecheck, Contracts, Unit & Security
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  quality-and-tests:
+    name: Python Quality, Contracts, Unit & Integration Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+      - name: Install locked dependencies
+        run: uv sync --extra dev --frozen
+      - name: Lint & format check (Ruff)
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
+      - name: Static typing (MyPy)
+        run: uv run mypy fleet_platform apps/fleet-api services/ingestion
+      - name: Verify pinned container tags (no floating latest)
+        run: |
+          if grep -E "image:.*:latest" infra/docker/docker-compose.yml infra/kubernetes/fleet-platform.yaml; then
+            echo "ERROR: Floating :latest image tag detected"
+            exit 1
+          fi
+      - name: Validate Docker Compose syntax
+        run: |
+          cp .env.example .env
+          docker compose -f infra/docker/docker-compose.yml --profile full config >/dev/null
+      - name: License compliance & SBOM generation
+        run: |
+          uv run python scripts/check_licenses.py
+          uv run python scripts/generate_sbom.py --output results/security/sbom.cdx.json
+      - name: Run unit, contract, integration & fault tests
+        run: uv run pytest -v --junitxml=results/tests/ci-junit.xml

@@ -1,0 +1,27 @@
+{
+  "type": "record",
+  "name": "TripEvent",
+  "namespace": "io.fleetplatform.events.v1",
+  "doc": "Synthetic autonomous trip start/end boundary event.",
+  "fields": [
+    {"name": "event_id", "type": "string"},
+    {"name": "vehicle_id", "type": "string"},
+    {"name": "trip_id", "type": "string"},
+    {"name": "event_type", "type": "string"},
+    {"name": "event_time", "type": "string"},
+    {"name": "ingest_time", "type": ["null", "string"], "default": null},
+    {"name": "sequence_number", "type": "long"},
+    {"name": "schema_version", "type": "string", "default": "1.0.0"},
+    {"name": "source_id", "type": "string"},
+    {"name": "correlation_id", "type": "string"},
+    {"name": "trace_id", "type": "string"},
+    {"name": "latitude", "type": "double"},
+    {"name": "longitude", "type": "double"},
+    {"name": "region", "type": "string"},
+    {"name": "software_version", "type": "string"},
+    {"name": "odometer_km", "type": "double"},
+    {"name": "battery_soc_pct", "type": "double"},
+    {"name": "route_id", "type": "string"},
+    {"name": "metadata", "type": {"type": "map", "values": "string"}, "default": {}}
+  ]
+}

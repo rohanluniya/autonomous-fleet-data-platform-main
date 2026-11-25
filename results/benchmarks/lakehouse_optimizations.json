@@ -1,0 +1,49 @@
+{
+  "engine": "pyiceberg-0.12.0 + duckdb-2.0.0 (local_native parity; Spark 4.1.4 suite in pipelines/spark/spark_optimization_benchmarks.py)",
+  "dataset_total_rows": 15095,
+  "experiments": {
+    "partition_pruning": {
+      "baseline_files_scanned": 20,
+      "optimized_files_scanned": 4,
+      "baseline_rows_read": 15095,
+      "optimized_rows_read": 3023,
+      "baseline_median_ms": 23.936,
+      "optimized_median_ms": 6.231,
+      "speedup_x": 3.84
+    },
+    "small_file_compaction": {
+      "files_before": 20,
+      "files_after": 5,
+      "bytes_before": 1418408,
+      "bytes_after": 1156052,
+      "baseline_scan_median_ms": 24.248,
+      "compacted_scan_median_ms": 5.472,
+      "speedup_x": 4.43,
+      "records_preserved": 15095
+    },
+    "predicate_pushdown_projection": {
+      "baseline_full_read_ms": 13.369,
+      "optimized_pushdown_projection_ms": 2.228,
+      "speedup_x": 6.0,
+      "rows_verified": 997
+    },
+    "incremental_vs_full_refresh": {
+      "full_5day_refresh_ms": 379.83,
+      "incremental_1day_backfill_ms": 373.96,
+      "speedup_x": 1.02,
+      "rows_verified": 14808
+    },
+    "skew_salting_parity": {
+      "unsalted_median_ms": 0.814,
+      "salted_two_stage_median_ms": 1.329,
+      "exact_numeric_parity": true,
+      "keys_verified": 251
+    },
+    "avro_vs_json_wire_size": {
+      "json_event_bytes": 971,
+      "avro_binary_event_bytes": 391,
+      "avro_size_reduction_pct": 59.73,
+      "sample_bronze_json_500_bytes": 540336
+    }
+  }
+}

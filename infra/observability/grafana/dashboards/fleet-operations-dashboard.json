@@ -1,0 +1,69 @@
+{
+  "title": "Autonomous Fleet Platform — Operational Observability",
+  "uid": "fleet-platform-ops",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "15s",
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Telemetry Events Produced & Bronze Ingested (rate/s)",
+      "gridPos": {"x": 0, "y": 0, "w": 12, "h": 8},
+      "targets": [
+        {"expr": "sum(rate(fleet_events_produced_total[1m]))", "legendFormat": "Produced/s"},
+        {"expr": "sum(rate(fleet_bronze_events_ingested_total[1m]))", "legendFormat": "Bronze Committed/s"}
+      ]
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Consumer Lag & Dead-Letter Queue Volume",
+      "gridPos": {"x": 12, "y": 0, "w": 12, "h": 8},
+      "targets": [
+        {"expr": "fleet_consumer_lag_records", "legendFormat": "Lag {{ consumer_group }}:{{ topic }}"},
+        {"expr": "sum(increase(fleet_dlq_messages_total[5m]))", "legendFormat": "DLQ (5m)"}
+      ]
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Flink Watermark Lag & Checkpoint Duration (p95)",
+      "gridPos": {"x": 0, "y": 8, "w": 12, "h": 8},
+      "targets": [
+        {"expr": "fleet_stream_watermark_lag_seconds", "legendFormat": "Watermark Lag (s)"},
+        {"expr": "histogram_quantile(0.95, sum(rate(fleet_stream_checkpoint_duration_seconds_bucket[5m])) by (le))", "legendFormat": "Checkpoint p95 (s)"}
+      ]
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Anomalies Detected by Rule & Severity",
+      "gridPos": {"x": 12, "y": 8, "w": 12, "h": 8},
+      "targets": [
+        {"expr": "sum by (rule_id, severity) (increase(fleet_anomalies_detected_total[5m]))", "legendFormat": "{{ rule_id }} ({{ severity }})"}
+      ]
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "Iceberg Data Files & Snapshot Growth",
+      "gridPos": {"x": 0, "y": 16, "w": 12, "h": 6},
+      "targets": [
+        {"expr": "fleet_iceberg_table_data_files", "legendFormat": "Files {{ table }}"},
+        {"expr": "fleet_iceberg_table_snapshots", "legendFormat": "Snapshots {{ table }}"}
+      ]
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "FastAPI Request Latency (p50 / p95) & Error Rate",
+      "gridPos": {"x": 12, "y": 16, "w": 12, "h": 6},
+      "targets": [
+        {"expr": "histogram_quantile(0.50, sum(rate(fleet_api_request_duration_seconds_bucket[5m])) by (le))", "legendFormat": "API p50"},
+        {"expr": "histogram_quantile(0.95, sum(rate(fleet_api_request_duration_seconds_bucket[5m])) by (le))", "legendFormat": "API p95"},
+        {"expr": "sum(rate(fleet_api_requests_total{status_code=~\"5..\"}[5m]))", "legendFormat": "5xx/s"}
+      ]
+    }
+  ]
+}

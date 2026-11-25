@@ -1,0 +1,70 @@
+[
+  {
+    "scenario": "broker_outage_and_producer_retry",
+    "status": "PASS",
+    "recovery_duration_ms": 50.39,
+    "measured_evidence": {
+      "retries_before_recovery": 2,
+      "records_committed": 1,
+      "data_loss": 0
+    },
+    "recorded_at_utc": "2026-11-25T01:24:23.917385+00:00"
+  },
+  {
+    "scenario": "stream_taskmanager_crash_checkpoint_restore",
+    "status": "PASS",
+    "recovery_duration_ms": 9.4,
+    "measured_evidence": {
+      "baseline_processed": 468,
+      "recovered_processed": 468,
+      "baseline_anomalies": 10,
+      "recovered_anomalies": 10,
+      "remaining_lag": 0
+    },
+    "recorded_at_utc": "2026-11-25T01:24:23.992301+00:00"
+  },
+  {
+    "scenario": "late_out_of_order_and_duplicate_surge",
+    "status": "PASS",
+    "recovery_duration_ms": 61.38,
+    "measured_evidence": {
+      "duplicates_suppressed_stream": 1,
+      "late_events_routed_to_side_output": 1,
+      "silver_clean_rows_preserved": 2
+    },
+    "recorded_at_utc": "2026-11-25T01:24:24.286601+00:00"
+  },
+  {
+    "scenario": "poison_dlq_and_silver_dq_quarantine",
+    "status": "PASS",
+    "recovery_duration_ms": 84.61,
+    "measured_evidence": {
+      "dlq_poison_quarantined": 4,
+      "silver_bounds_quarantined": 1,
+      "silent_drops": 0
+    },
+    "recorded_at_utc": "2026-11-25T01:24:24.427209+00:00"
+  },
+  {
+    "scenario": "idempotent_replay_backfill_and_cdc_dedup",
+    "status": "PASS",
+    "recovery_duration_ms": 394.78,
+    "measured_evidence": {
+      "gold_events_before": 120,
+      "gold_events_after_double_replay": 120,
+      "scd2_rows_idempotent": 25
+    },
+    "recorded_at_utc": "2026-11-25T01:24:24.887577+00:00"
+  },
+  {
+    "scenario": "schema_rejection_and_hot_key_skew_salting",
+    "status": "PASS",
+    "recovery_duration_ms": 0.51,
+    "measured_evidence": {
+      "hot_key_share_pct": 80.0,
+      "unique_keys": 201,
+      "salted_vs_direct_parity": true
+    },
+    "recorded_at_utc": "2026-11-25T01:24:24.890695+00:00"
+  }
+]

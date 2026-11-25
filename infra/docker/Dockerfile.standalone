@@ -1,0 +1,38 @@
+# Self-contained portable image: auto-seeds a 1,000-vehicle Apache Iceberg lakehouse
+# and serves the FastAPI API + MapLibre Dashboard on port 8000 with zero external dependencies.
+FROM python:3.12.8-slim-bookworm
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    FLEET_ENV=dev \
+    FLEET_EXECUTION_PROFILE=local_native \
+    FLEET_TRANSPORT_MODE=local_wal \
+    FLEET_LOCAL_DATA_DIR=/data
+
+RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && useradd --create-home --uid 10001 fleetuser \
+    && mkdir -p /data && chown -R fleetuser:fleetuser /data
+
+WORKDIR /app
+COPY pyproject.toml uv.lock README.md /app/
+COPY fleet_platform /app/fleet_platform
+COPY apps /app/apps
+COPY services /app/services
+COPY pipelines /app/pipelines
+COPY schemas /app/schemas
+COPY scripts /app/scripts
+
+RUN pip install --no-cache-dir --upgrade pip==25.0.1 \
+    && pip install --no-cache-dir . \
+    && chmod +x /app/scripts/entrypoint_standalone.sh \
+    && chown -R fleetuser:fleetuser /app
+
+USER fleetuser
+VOLUME ["/data"]
+EXPOSE 8000
+
+HEALTHCHECK --interval=15s --timeout=5s --retries=5 \
+  CMD curl -fsS http://127.0.0.1:8000/health || exit 1
+
+ENTRYPOINT ["/app/scripts/entrypoint_standalone.sh"]

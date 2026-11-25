@@ -1,0 +1,29 @@
+{
+  "name": "fleet-postgres-vehicle-registry-cdc",
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "tasks.max": "1",
+    "database.hostname": "postgres",
+    "database.port": "5432",
+    "database.user": "${file:/opt/connect/secrets/pg.properties:user}",
+    "database.password": "${file:/opt/connect/secrets/pg.properties:password}",
+    "database.dbname": "fleet_ops",
+    "topic.prefix": "fleet.cdc",
+    "plugin.name": "pgoutput",
+    "slot.name": "fleet_cdc_slot",
+    "publication.name": "fleet_cdc_pub",
+    "table.include.list": "fleet_ops.vehicle_registry,fleet_ops.firmware_deployments,fleet_ops.maintenance_events",
+    "snapshot.mode": "initial",
+    "tombstones.on.delete": "true",
+    "heartbeat.interval.ms": "30000",
+    "decimal.handling.mode": "double",
+    "time.precision.mode": "adaptive_time_microseconds",
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "key.converter.schemas.enable": "false",
+    "value.converter.schemas.enable": "false",
+    "errors.tolerance": "all",
+    "errors.deadletterqueue.topic.name": "fleet.telemetry.dlq",
+    "errors.deadletterqueue.context.headers.enable": "true"
+  }
+}

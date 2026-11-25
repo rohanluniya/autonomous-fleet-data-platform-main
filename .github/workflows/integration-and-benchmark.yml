@@ -1,0 +1,37 @@
+name: Scheduled Full-Stack Integration & Sustained Benchmarks
+
+on:
+  workflow_dispatch:
+    inputs:
+      profiles:
+        description: "Benchmark profiles (space-separated)"
+        required: false
+        default: "smoke local stress"
+  schedule:
+    - cron: "0 6 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  benchmarks-and-container-build:
+    name: Container Build Check & Sustained Benchmarks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+      - name: Install locked dependencies
+        run: uv sync --extra dev --frozen
+      - name: Build Python service container image
+        run: docker build -f infra/docker/Dockerfile.python -t fleet-api:ci-test .
+      - name: Run sustained benchmarks
+        run: uv run python benchmarks/run_benchmarks.py --profiles ${{ github.event.inputs.profiles || 'smoke local' }}
+      - name: Run lakehouse optimization benchmarks
+        run: uv run python benchmarks/lakehouse_optimizations.py
+      - name: Upload benchmark artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results
+          path: results/benchmarks/

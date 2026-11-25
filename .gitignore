@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+
+# Local runtime & scratch artifacts
+.tools/
+.local_data/
+.warehouse/
+.wal/
+.checkpoints/
+.airflow/
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+.env
+.env.local
+
+# IDE / OS
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+
+# Docker & K8s overrides
+docker-compose.override.yml
+*.kubeconfig
+
+# Node / frontend builds if used locally
+node_modules/

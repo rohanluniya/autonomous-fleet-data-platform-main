@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Autonomous Fleet Telemetry & Driving Intelligence Platform</title>
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body>
+  <header class="top-bar">
+    <div class="brand-group">
+      <div class="brand-dot" aria-hidden="true"></div>
+      <div>
+        <h1>Autonomous Fleet Telemetry &amp; Driving Intelligence</h1>
+        <p class="subtitle">Open-Source Distributed Lakehouse &amp; Event-Time Streaming Platform</p>
+      </div>
+    </div>
+    <div class="status-badges">
+      <span class="badge badge-sim" id="badge-synthetic">SIMULATED SYNTHETIC FLEET DATA</span>
+      <span class="badge badge-env" id="badge-profile">Profile: loading...</span>
+      <span class="badge badge-privacy" id="badge-privacy">Location: H3 Res-6 Coarsened</span>
+      <button class="btn-refresh" id="btn-refresh" type="button">Refresh Data</button>
+    </div>
+  </header>
+
+  <section class="time-strip" aria-label="Event time vs processing time metadata">
+    <div class="time-item">
+      <span class="time-label">Latest Event Time (Vehicle Clock UTC)</span>
+      <strong id="meta-event-time">--</strong>
+    </div>
+    <div class="time-item">
+      <span class="time-label">Latest Processing / Ingest Time (UTC)</span>
+      <strong id="meta-ingest-time">--</strong>
+    </div>
+    <div class="time-item">
+      <span class="time-label">SQL Engine</span>
+      <strong id="meta-sql-engine">--</strong>
+    </div>
+    <div class="time-item">
+      <span class="time-label">Event Transport</span>
+      <strong id="meta-transport">--</strong>
+    </div>
+  </section>
+
+  <main class="dashboard-grid">
+    <!-- KPI Row -->
+    <section class="kpi-row" aria-label="Headline Fleet Metrics">
+      <article class="kpi-card">
+        <span class="kpi-label">Active Fleet Vehicles</span>
+        <div class="kpi-value" id="kpi-total-vehicles">--</div>
+        <div class="kpi-sub" id="kpi-state-breakdown">--</div>
+      </article>
+      <article class="kpi-card">
+        <span class="kpi-label">Telemetry Gaps / Offline</span>
+        <div class="kpi-value warn-text" id="kpi-gaps-offline">--</div>
+        <div class="kpi-sub" id="kpi-gaps-sub">Event-time timer + state monitor</div>
+      </article>
+      <article class="kpi-card">
+        <span class="kpi-label">Verified Stream Anomalies</span>
+        <div class="kpi-value danger-text" id="kpi-anomalies">--</div>
+        <div class="kpi-sub" id="kpi-anomalies-sub">--</div>
+      </article>
+      <article class="kpi-card">
+        <span class="kpi-label">Reconstructed Trips</span>
+        <div class="kpi-value" id="kpi-trips">--</div>
+        <div class="kpi-sub" id="kpi-trips-sub">--</div>
+      </article>
+      <article class="kpi-card">
+        <span class="kpi-label">Mean Battery SoC &amp; Sensor Health</span>
+        <div class="kpi-value accent-text" id="kpi-health">--</div>
+        <div class="kpi-sub" id="kpi-health-sub">--</div>
+      </article>
+      <article class="kpi-card">
+        <span class="kpi-label">Data Quality &amp; Reconciliation</span>
+        <div class="kpi-value ok-text" id="kpi-dq">--</div>
+        <div class="kpi-sub" id="kpi-dq-sub">--</div>
+      </article>
+    </section>
+
+    <!-- Geospatial Map + Software Version Analysis -->
+    <section class="panel panel-map">
+      <div class="panel-header">
+        <div>
+          <h2>Geospatial Fleet Density &amp; Anomaly Hotspots (H3 Res-6)</h2>
+          <p class="panel-desc">Self-hosted offline GeoJSON vector basemap + metro geofences. Exact GPS coordinates withheld for public/analyst roles.</p>
+        </div>
+        <div class="region-tabs" role="tablist" aria-label="Select metro region">
+          <button class="tab-btn active" data-region="sf_bay" type="button">San Francisco</button>
+          <button class="tab-btn" data-region="phoenix_metro" type="button">Phoenix</button>
+          <button class="tab-btn" data-region="austin_metro" type="button">Austin</button>
+        </div>
+      </div>
+      <div id="fleet-map" class="map-container"></div>
+      <div class="map-legend">
+        <span><i class="swatch swatch-low"></i>Low Density H3</span>
+        <span><i class="swatch swatch-med"></i>Moderate Activity</span>
+        <span><i class="swatch swatch-hot"></i>Anomaly Hotspot H3</span>
+        <span><i class="swatch swatch-fence"></i>Metro Geofence</span>
+        <span><i class="swatch swatch-route"></i>Planned Route</span>
+      </div>
+    </section>
+
+    <section class="panel panel-charts-col">
+      <div class="chart-card">
+        <div class="panel-header compact">
+          <h2>Anomaly Rate by Software Version</h2>
+          <span class="pill">Normalized per 1k events</span>
+        </div>
+        <div class="chart-wrap"><canvas id="chart-sw-version"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="panel-header compact">
+          <h2>Event-Time Anomaly Timeline</h2>
+          <span class="pill">Critical vs. High</span>
+        </div>
+        <div class="chart-wrap"><canvas id="chart-anomaly-timeline"></canvas></div>
+      </div>
+    </section>
+
+    <!-- Secondary Charts Row -->
+    <section class="panel panel-half">
+      <div class="panel-header compact">
+        <h2>Fleet Reliability by Region (Dedup &amp; Late Arrivals)</h2>
+        <span class="pill">Bronze -> Silver Reconciliation</span>
+      </div>
+      <div class="chart-wrap tall"><canvas id="chart-reliability"></canvas></div>
+    </section>
+
+    <section class="panel panel-half">
+      <div class="panel-header compact">
+        <h2>Anomalies by Rule &amp; Trip Risk Distribution</h2>
+        <span class="pill">Versioned Rules + CEP</span>
+      </div>
+      <div class="chart-wrap tall"><canvas id="chart-rules"></canvas></div>
+    </section>
+
+    <!-- Interactive Operational Tables -->
+    <section class="panel panel-full">
+      <div class="panel-header">
+        <div>
+          <h2>Operational Intelligence &amp; Platform Observability</h2>
+          <p class="panel-desc">Switch views to inspect explainable streaming anomalies, high-risk trips, data quality gates, Iceberg snapshots, and OpenLineage runs.</p>
+        </div>
+        <div class="view-tabs" role="tablist">
+          <button class="tab-btn active" data-view="anomalies" type="button">Anomalies</button>
+          <button class="tab-btn" data-view="trips" type="button">High-Risk Trips</button>
+          <button class="tab-btn" data-view="dq" type="button">Data Quality</button>
+          <button class="tab-btn" data-view="observability" type="button">Iceberg &amp; Lineage</button>
+        </div>
+      </div>
+
+      <div id="view-anomalies" class="table-view active">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Vehicle</th>
+              <th>Rule ID &amp; Version</th>
+              <th>Severity</th>
+              <th>Region / SW</th>
+              <th>Event Time (UTC)</th>
+              <th>Detection Time (UTC)</th>
+              <th>Explainable Evidence</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-anomalies"></tbody>
+        </table>
+      </div>
+
+      <div id="view-trips" class="table-view">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Trip ID</th>
+              <th>Vehicle</th>
+              <th>Region / SW</th>
+              <th>Distance (km)</th>
+              <th>Duration (s)</th>
+              <th>Anomalies (Crit)</th>
+              <th>Sim. Disengagements</th>
+              <th>Risk Score / Tier</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-trips"></tbody>
+        </table>
+      </div>
+
+      <div id="view-dq" class="table-view">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Layer</th>
+              <th>Quality Check</th>
+              <th>Status</th>
+              <th>Observed</th>
+              <th>Warn / Fail Thresholds</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-dq"></tbody>
+        </table>
+      </div>
+
+      <div id="view-observability" class="table-view">
+        <div class="obs-split">
+          <div>
+            <h3>Apache Iceberg Format V2 Tables</h3>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Table</th>
+                  <th>Snapshots</th>
+                  <th>Parquet Files</th>
+                  <th>Rows</th>
+                  <th>Size (KB)</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-iceberg"></tbody>
+            </table>
+          </div>
+          <div>
+            <h3>Recent OpenLineage Runs &amp; Consumer Lag</h3>
+            <div id="lag-summary" class="lag-box"></div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Event</th>
+                  <th>Job Name</th>
+                  <th>Inputs -> Outputs</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-lineage"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    Autonomous Fleet Telemetry &amp; Driving Intelligence Platform · Open-Source Reference Implementation · All telemetry &amp; autonomy events are synthetic.
+  </footer>
+
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script src="/assets/app.js"></script>
+</body>
+</html>

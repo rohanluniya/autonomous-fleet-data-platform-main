@@ -1,0 +1,26 @@
+{
+  "type": "record",
+  "name": "AnomalyEvent",
+  "namespace": "io.fleetplatform.events.v1",
+  "doc": "Explainable, versioned driving or sensor anomaly emitted by stream processing.",
+  "fields": [
+    {"name": "anomaly_id", "type": "string"},
+    {"name": "vehicle_id", "type": "string"},
+    {"name": "trip_id", "type": ["null", "string"], "default": null},
+    {"name": "region", "type": "string"},
+    {"name": "software_version", "type": "string"},
+    {"name": "rule_id", "type": "string"},
+    {"name": "rule_version", "type": "string"},
+    {"name": "severity", "type": "string"},
+    {"name": "event_time", "type": "string"},
+    {"name": "detection_time", "type": "string"},
+    {"name": "latitude", "type": ["null", "double"], "default": null},
+    {"name": "longitude", "type": ["null", "double"], "default": null},
+    {"name": "h3_cell_res6", "type": ["null", "string"], "default": null},
+    {"name": "evidence_json", "type": "string"},
+    {"name": "source_event_ids", "type": {"type": "array", "items": "string"}},
+    {"name": "correlation_id", "type": "string"},
+    {"name": "trace_id", "type": "string"},
+    {"name": "schema_version", "type": "string", "default": "1.0.0"}
+  ]
+}

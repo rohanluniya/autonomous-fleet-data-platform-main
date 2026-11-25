@@ -1,0 +1,24 @@
+# One-command portable standalone deployment (runs identically on macOS, Linux, Windows WSL2, or any VM).
+# Usage: docker compose -f infra/docker/docker-compose.standalone.yml up --build
+
+volumes:
+  fleet_standalone_data:
+
+services:
+  fleet-platform:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.standalone
+    image: autonomous-fleet-data-platform:0.1.0-standalone
+    ports:
+      - "8000:8000"
+    environment:
+      FLEET_ENV: "${FLEET_ENV:-dev}"
+      FLEET_SEED_PROFILE: "${FLEET_SEED_PROFILE:-local}"
+      FLEET_SEED_TICKS: "${FLEET_SEED_TICKS:-10}"
+      FLEET_API_ADMIN_TOKEN: "${FLEET_API_ADMIN_TOKEN:-dev-admin-token-change-me}"
+      FLEET_API_OPERATOR_TOKEN: "${FLEET_API_OPERATOR_TOKEN:-dev-operator-token-change-me}"
+      FLEET_API_ANALYST_TOKEN: "${FLEET_API_ANALYST_TOKEN:-dev-analyst-token-change-me}"
+    volumes:
+      - fleet_standalone_data:/data
+    restart: unless-stopped

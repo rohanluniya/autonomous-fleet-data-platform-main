@@ -1,0 +1,20 @@
+{
+  "type": "record",
+  "name": "VehicleStateEvent",
+  "namespace": "io.fleetplatform.events.v1",
+  "doc": "Keyed vehicle connectivity and operational state update emitted by stream processing.",
+  "fields": [
+    {"name": "event_id", "type": "string"},
+    {"name": "vehicle_id", "type": "string"},
+    {"name": "region", "type": "string"},
+    {"name": "software_version", "type": "string"},
+    {"name": "operational_state", "type": "string"},
+    {"name": "connectivity_status", "type": "string"},
+    {"name": "last_event_time", "type": "string"},
+    {"name": "state_updated_at", "type": "string"},
+    {"name": "gap_duration_seconds", "type": "double", "default": 0.0},
+    {"name": "battery_soc_pct", "type": "double"},
+    {"name": "h3_cell_res6", "type": ["null", "string"], "default": null},
+    {"name": "schema_version", "type": "string", "default": "1.0.0"}
+  ]
+}
