@@ -96,7 +96,7 @@ Then open **`http://localhost:8000`** (interactive dashboard) and **`http://loca
 ### Option B — Zero-Docker Native Python (macOS / Linux with Python 3.12+ or `uv`)
 
 ```bash
-git clone https://github.com/rohanluniya/autonomous-fleet-data-platform.git
+git clone https://github.com/rohanluniya/autonomous-fleet-data-platform-main.git autonomous-fleet-data-platform
 cd autonomous-fleet-data-platform
 
 # One-command setup, 1,000-vehicle pipeline seed, and live server launch:
