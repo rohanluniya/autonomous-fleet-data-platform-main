@@ -80,7 +80,7 @@ Requires only Docker. Auto-seeds the 1,000-vehicle Apache Iceberg lakehouse on f
 
 ```bash
 # 1. Clone the repository on any machine
-git clone https://github.com/ankdeshm/autonomous-fleet-data-platform.git
+git clone https://github.com/rohanluniya/autonomous-fleet-data-platform-main.git autonomous-fleet-data-platform
 cd autonomous-fleet-data-platform
 
 # 2. Build and launch the self-contained container (auto-seeds 1,000 vehicles + Iceberg V2)
@@ -96,7 +96,7 @@ Then open **`http://localhost:8000`** (interactive dashboard) and **`http://loca
 ### Option B — Zero-Docker Native Python (macOS / Linux with Python 3.12+ or `uv`)
 
 ```bash
-git clone https://github.com/ankdeshm/autonomous-fleet-data-platform.git
+git clone https://github.com/rohanluniya/autonomous-fleet-data-platform.git
 cd autonomous-fleet-data-platform
 
 # One-command setup, 1,000-vehicle pipeline seed, and live server launch:
