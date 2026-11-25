@@ -134,6 +134,5 @@ make lint && make typecheck && make check-licenses && make sbom
 - **[docs/compatibility.md](docs/compatibility.md)** — Verified release pins, Maven coordinates, CPU architecture matrix, and licenses.
 - **[docs/capacity-model.md](docs/capacity-model.md)** — Analytical 100 to 1,000,000-vehicle sizing model exposing the 24h dedup state bottleneck.
 - **[docs/incident-reports/INC-001-stream-crash-and-poison-surge.md](docs/incident-reports/INC-001-stream-crash-and-poison-surge.md)** — Real incident report generated from controlled fault-injection outputs.
-- **[docs/interview-deep-dive.md](docs/interview-deep-dive.md)** — 5–10 minute demo walkthrough and staff-level engineering discussion guide.
 - **[docs/engineering-case-study.md](docs/engineering-case-study.md)**, **[docs/threat-model.md](docs/threat-model.md)**, **[docs/operations/runbooks.md](docs/operations/runbooks.md)**, and **[docs/limitations.md](docs/limitations.md)**.
 - **[results/](results/)** — Raw JSON, CSV, JUnit XML, and CycloneDX SBOM outputs backing every number in this repository.
